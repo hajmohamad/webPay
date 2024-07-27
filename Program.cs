@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.IdentityModel.Tokens;
 using webPay.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,16 +10,38 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllersWithViews();
 
-// builder.Services.AddControllers()
-//     .ConfigureApiBehaviorOptions(options =>
-//     {
-//         options.SuppressConsumesConstraintForFormFileParameters = true;
-//         options.SuppressInferBindingSourcesForParameters = true;
-//         options.SuppressModelStateInvalidFilter = true;
-//         options.SuppressMapClientErrors = true;
-//         options.ClientErrorMapping[StatusCodes.Status404NotFound].Link =
-//             "https://httpstatuses.com/404";
-//     });
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequiredUniqueChars = 1;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+}).AddEntityFrameworkStores<WebPayDbContext>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme =
+        options.DefaultScheme =
+            options.DefaultChallengeScheme =
+                options.DefaultForbidScheme =
+                    options.DefaultSignInScheme =
+                        options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["JWT:Audience"],
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])
+        )
+    };    
+});
 
 var app = builder.Build();
 
@@ -30,6 +54,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseStaticFiles();
 
 app.UseRouting();

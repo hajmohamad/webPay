@@ -28,10 +28,7 @@ public class CustomersController : Controller
     {
 
         
-     var customers = _dbContext.Customers.Include(c => c.MemberShipType).ToList();
-    
-        CustomersPageAttribute.CustomersPage = new CustomersPageAttribute() { Customers = customers };
-        return View(CustomersPageAttribute.CustomersPage);
+        return View();
     }
 
     public ActionResult CustomerViewPage(int id)
