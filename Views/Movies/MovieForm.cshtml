@@ -1,0 +1,29 @@
+@model webPay.Models.PageAttribute.MovieFormViewModel
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+<h1>Movies</h1>
+
+@using (Html.BeginForm("Save", "Movies"))
+{
+<div class="form-group">
+    @Html.LabelFor(m => m.Movie.Name)
+    @Html.TextBoxFor(m => m.Movie.Name, new { @class = "form-control" })
+</div>
+<div class="form-group">
+    @Html.LabelFor(m => m.Movie.NumberInStock)
+    @Html.TextBoxFor(m => m.Movie.NumberInStock,  new { @class = "form-control" })
+
+</div>
+
+<div class="form-group">
+    @Html.DropDownListFor(m => m.Movie.Genre, new SelectList(Model.GenreList,Model.GenreList  ), "select movie Genre", new { @class = "form-control" })
+</div>
+<button type="submit" class="btn btn-primary">save</button>
+@Html.HiddenFor(m => m.Movie.Id)
+
+
+}
+
