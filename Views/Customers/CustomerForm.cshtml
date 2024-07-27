@@ -1,0 +1,38 @@
+@model webPay.Models.PageAttribute.CustomerFormViewModel
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+@if (@Model.Customer.Id == 0)
+{
+    <h2>new customer</h2>
+}
+else
+{
+    <h2>edit customer</h2>
+    @using (Html.BeginForm("Save", "Customers"))
+    {
+        <div class="form-group">
+            @Html.LabelFor(m => m.Customer.Name)
+            @Html.TextBoxFor(m => m.Customer.Name, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Customer.DateOfBirth)
+            @Html.TextBoxFor(m => m.Customer.DateOfBirth, "{0:d MMM yyyy}", new { @class = "form-control" })
+
+        </div>
+        <div class="checkbox">
+            <label >
+                @Html.CheckBoxFor(m => m.Customer.IsSubscribed) subscribe for newsLetter
+            </label>
+        </div>
+        <div class="form-group">
+            @Html.DropDownListFor(m => m.Customer.MemberShipTypeId, new SelectList(Model.MemberShipTypes, "Id", "Name"), "select MemberShip Type", new { @class = "form-control" })
+        </div>
+        <button type="submit" class="btn btn-primary">save</button>
+        @Html.HiddenFor(m => m.Customer.Id)
+
+
+    }
+}
